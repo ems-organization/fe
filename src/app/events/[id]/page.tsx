@@ -1,0 +1,139 @@
+"use client";
+
+import ConfirmDialog from "@/components/confirm-dialog";
+import { deleteEvent, getEvent } from "@/lib/queries";
+import { Event } from "@/types/event";
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Divider,
+  Typography,
+} from "@mui/material";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { use, useState } from "react";
+
+export default function EventDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const router = useRouter();
+  const { id } = use(params);
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, isError } = useQuery<Event>({
+    queryKey: ["event", id],
+    queryFn: () => getEvent(id),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteEvent(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      router.push("/events");
+    },
+    onError: () => {
+      alert("Failed to delete event");
+    },
+  });
+
+  const [openDelete, setOpenDelete] = useState(false);
+
+  if (isLoading) {
+    return (
+      <Box p={4} textAlign="center">
+        <CircularProgress />
+        <Typography mt={2}>Loading event...</Typography>
+      </Box>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <Box p={4}>
+        <Alert severity="error">Event not found</Alert>
+        <Button
+          component={Link}
+          href="/events"
+          variant="contained"
+          sx={{ mt: 2 }}
+        >
+          Back to Events
+        </Button>
+      </Box>
+    );
+  }
+
+  const event = data;
+
+  return (
+    <>
+      <Box p={4}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="h4">{event.title}</Typography>
+
+          <Box display="flex" gap={2}>
+            <Button
+              variant="outlined"
+              component={Link}
+              href={`/events/${id}/edit`}
+            >
+              Edit
+            </Button>
+
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => setOpenDelete(true)}
+            >
+              Delete
+            </Button>
+          </Box>
+        </Box>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Chip label={event.category} color="primary" sx={{ mb: 2 }} />
+
+        <Typography variant="body1" color="text.secondary" mb={1}>
+          <strong>Date:</strong> {new Date(event.date).toLocaleString()}
+        </Typography>
+
+        <Typography variant="body1" color="text.secondary" mb={1}>
+          <strong>Location:</strong> {event.location}
+        </Typography>
+
+        <Typography variant="body1" mt={3}>
+          {event.description}
+        </Typography>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Button variant="text" component={Link} href="/events">
+          ← Back to Events
+        </Button>
+      </Box>
+
+      <ConfirmDialog
+        open={openDelete}
+        title="Delete Event"
+        description={
+          <>
+            Are you sure you want to delete <strong>{event.title}</strong>? This
+            action cannot be undone.
+          </>
+        }
+        confirmText="Delete"
+        cancelText="Cancel"
+        loading={deleteMutation.isPending}
+        onClose={() => !deleteMutation.isPending && setOpenDelete(false)}
+        onConfirm={() => deleteMutation.mutate()}
+      />
+    </>
+  );
+}
