@@ -47,6 +47,16 @@ export default function EventForm({
     onSubmit: ({ value }) => onSubmit(value),
   });
 
+  function toDatetimeLocal(value: string) {
+    if (!value) return "";
+    const d = new Date(value);
+    const pad = (n: number) => String(n).padStart(2, "0");
+
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(
+      d.getDate()
+    )}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
   return (
     <Box
       component="form"
@@ -58,7 +68,6 @@ export default function EventForm({
       flexDirection="column"
       gap={2}
     >
-      {/* Title */}
       <form.Field name="title">
         {(field) => (
           <TextField
@@ -78,7 +87,7 @@ export default function EventForm({
           <TextField
             type="datetime-local"
             label="Date"
-            value={field.state.value ?? ""}
+            value={toDatetimeLocal(field.state.value)}
             onChange={(e) => field.handleChange(e.target.value)}
             slotProps={{ inputLabel: { shrink: true } }}
             error={!!field.state.meta.errors?.length}
