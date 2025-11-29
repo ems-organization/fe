@@ -79,10 +79,9 @@ export default function EventsMap({ events }: { events: Event[] }) {
       ref={mapContainer}
       style={{
         width: "100%",
-        height: "calc(100vh - 64px)",
+        height: "100%",
         borderRadius: "12px",
         overflow: "hidden",
-        marginTop: "16px",
       }}
     />
   );

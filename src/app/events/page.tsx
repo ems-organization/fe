@@ -35,6 +35,7 @@ export default function EventsPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [view, setView] = useState<"list" | "map">("list");
+  const isMapView = view === "map";
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["events", sort, order, category],
@@ -50,7 +51,14 @@ export default function EventsPage() {
   }
 
   return (
-    <Box p={isMobile ? 2 : 3}>
+    <Box
+      p={isMobile ? 2 : 3}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: isMapView ? "calc(100vh - 64px)" : "auto",
+      }}
+    >
       <Box
         display="flex"
         flexDirection={isMobile ? "column" : "row"}
@@ -103,26 +111,10 @@ export default function EventsPage() {
         </Box>
       )}
 
-      {/* {data?.length === 0 ? (
-        <Typography>No events found.</Typography>
-      ) : (
-        <Grid container spacing={2}>
-          {data?.map((event: Event) => (
-            <Grid
-              key={event.id}
-              size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
-              sx={{ display: "flex" }}
-            >
-              <Box sx={{ flexGrow: 1 }}>
-                <EventCard event={event} />
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      )} */}
-
-      {view === "map" ? (
-        <EventsMap events={data || []} />
+      {isMapView ? (
+        <Box sx={{ flex: 1, minHeight: 0, mt: 2 }}>
+          <EventsMap events={data || []} />
+        </Box>
       ) : (
         <Grid container spacing={2}>
           {data?.map((event: Event) => (
