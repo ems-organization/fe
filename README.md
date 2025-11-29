@@ -13,8 +13,8 @@ Next.js app for browsing and creating events with map-based discovery and locati
 
 1. Install Node 20+ and npm.
 2. Install dependencies: `npm install`
-3. Create `.env.local` with at least:
-   - `NEXT_PUBLIC_API_URL=http://localhost:3000/api` (point to your backend)
+3. Copy `.env.example` to `.env.local` and set values for your backend:
+   - `NEXT_PUBLIC_API_URL=http://localhost:3000/api`
 4. Run the dev server: `npm run dev` (default at `http://localhost:3000`)
 
 Other scripts:
