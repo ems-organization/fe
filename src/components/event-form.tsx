@@ -73,7 +73,6 @@ export default function EventForm({
         )}
       </form.Field>
 
-      {/* Date */}
       <form.Field name="date">
         {(field) => (
           <TextField
@@ -91,7 +90,6 @@ export default function EventForm({
         )}
       </form.Field>
 
-      {/* Address text */}
       <form.Field name="location">
         {(field) => (
           <TextField
@@ -106,7 +104,6 @@ export default function EventForm({
         )}
       </form.Field>
 
-      {/* Category */}
       <form.Field name="category">
         {(field) => (
           <TextField
@@ -130,7 +127,6 @@ export default function EventForm({
         )}
       </form.Field>
 
-      {/* Description */}
       <form.Field name="description">
         {(field) => (
           <TextField
@@ -147,14 +143,13 @@ export default function EventForm({
         )}
       </form.Field>
 
-      {/* Latitude + Longitude */}
       <Box display="flex" gap={2}>
         <form.Field name="latitude">
           {(field) => (
             <TextField
               label="Latitude"
               value={field.state.value ?? ""}
-              InputProps={{ readOnly: true }}
+              slotProps={{ input: { readOnly: true } }}
             />
           )}
         </form.Field>
@@ -164,13 +159,12 @@ export default function EventForm({
             <TextField
               label="Longitude"
               value={field.state.value ?? ""}
-              InputProps={{ readOnly: true }}
+              slotProps={{}}
             />
           )}
         </form.Field>
       </Box>
 
-      {/* MAP PICKER */}
       <Typography variant="subtitle1" mt={1}>
         Pick location on map:
       </Typography>
@@ -189,12 +183,11 @@ export default function EventForm({
           form.setFieldValue("longitude", lng);
 
           if (address) {
-            form.setFieldValue("location", address); // auto-fill address
+            form.setFieldValue("location", address);
           }
         }}
       />
 
-      {/* Submit */}
       <Button
         type="submit"
         variant="contained"
