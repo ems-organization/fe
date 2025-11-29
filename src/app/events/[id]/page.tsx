@@ -2,6 +2,7 @@
 
 import ConfirmDialog from "@/components/confirm-dialog";
 import EventCard from "@/components/event-card";
+import { useErrorSnackbar } from "@/hooks/use-error-snackbar";
 import { deleteEvent, getEvent, getRecommendations } from "@/lib/queries";
 import { Event } from "@/types/event";
 import {
@@ -28,6 +29,8 @@ export default function EventDetailsPage({
   const { id } = use(params);
   const queryClient = useQueryClient();
 
+  const { showError, ErrorSnackbar } = useErrorSnackbar();
+
   const {
     data: event,
     isLoading,
@@ -35,6 +38,7 @@ export default function EventDetailsPage({
   } = useQuery<Event>({
     queryKey: ["event", id],
     queryFn: () => getEvent(id),
+    retry: false,
   });
 
   const deleteMutation = useMutation({
@@ -43,8 +47,8 @@ export default function EventDetailsPage({
       queryClient.invalidateQueries({ queryKey: ["events"] });
       router.push("/events");
     },
-    onError: () => {
-      alert("Failed to delete event");
+    onError: (err: any) => {
+      showError(err?.message || "Failed to delete event");
     },
   });
 
@@ -56,6 +60,7 @@ export default function EventDetailsPage({
     queryKey: ["event-recommendations", id],
     queryFn: () => getRecommendations(id),
     enabled: !!event,
+    retry: false,
   });
 
   const [openDelete, setOpenDelete] = useState(false);
@@ -143,6 +148,11 @@ export default function EventDetailsPage({
           </Box>
         )}
 
+        {isErrorRecs && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            Failed to load recommendations
+          </Alert>
+        )}
         {!isLoadingRecs && recommendations?.length === 0 && (
           <Typography color="text.secondary">
             No similar events nearby.
@@ -181,6 +191,8 @@ export default function EventDetailsPage({
         onClose={() => !deleteMutation.isPending && setOpenDelete(false)}
         onConfirm={() => deleteMutation.mutate()}
       />
+
+      <ErrorSnackbar />
     </>
   );
 }
