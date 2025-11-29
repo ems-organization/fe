@@ -19,8 +19,8 @@ export default function EventFilters({ fullWidth }: { fullWidth?: boolean }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const sort = searchParams.get("sort") || "date";
-  const order = searchParams.get("order") || "asc";
+  const sort = searchParams.get("sort") || "";
+  const order = searchParams.get("order") || "";
   const category = searchParams.get("category") || "";
 
   const updateParam = (key: string, value: string) => {
