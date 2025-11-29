@@ -1,9 +1,10 @@
 "use client";
 
 import { EventCategory } from "@/enums/category.enum";
-import { Box, Button, MenuItem, TextField } from "@mui/material";
+import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
+import MapLocationPicker from "./map-location-picker";
 
 const EventFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -57,6 +58,7 @@ export default function EventForm({
       flexDirection="column"
       gap={2}
     >
+      {/* Title */}
       <form.Field name="title">
         {(field) => (
           <TextField
@@ -71,6 +73,7 @@ export default function EventForm({
         )}
       </form.Field>
 
+      {/* Date */}
       <form.Field name="date">
         {(field) => (
           <TextField
@@ -88,6 +91,7 @@ export default function EventForm({
         )}
       </form.Field>
 
+      {/* Address text */}
       <form.Field name="location">
         {(field) => (
           <TextField
@@ -102,6 +106,7 @@ export default function EventForm({
         )}
       </form.Field>
 
+      {/* Category */}
       <form.Field name="category">
         {(field) => (
           <TextField
@@ -125,6 +130,7 @@ export default function EventForm({
         )}
       </form.Field>
 
+      {/* Description */}
       <form.Field name="description">
         {(field) => (
           <TextField
@@ -141,6 +147,54 @@ export default function EventForm({
         )}
       </form.Field>
 
+      {/* Latitude + Longitude */}
+      <Box display="flex" gap={2}>
+        <form.Field name="latitude">
+          {(field) => (
+            <TextField
+              label="Latitude"
+              value={field.state.value ?? ""}
+              InputProps={{ readOnly: true }}
+            />
+          )}
+        </form.Field>
+
+        <form.Field name="longitude">
+          {(field) => (
+            <TextField
+              label="Longitude"
+              value={field.state.value ?? ""}
+              InputProps={{ readOnly: true }}
+            />
+          )}
+        </form.Field>
+      </Box>
+
+      {/* MAP PICKER */}
+      <Typography variant="subtitle1" mt={1}>
+        Pick location on map:
+      </Typography>
+
+      <MapLocationPicker
+        value={
+          form.state.values.latitude && form.state.values.longitude
+            ? {
+                lat: form.state.values.latitude,
+                lng: form.state.values.longitude,
+              }
+            : null
+        }
+        onChange={({ lat, lng, address }) => {
+          form.setFieldValue("latitude", lat);
+          form.setFieldValue("longitude", lng);
+
+          if (address) {
+            form.setFieldValue("location", address); // auto-fill address
+          }
+        }}
+      />
+
+      {/* Submit */}
       <Button
         type="submit"
         variant="contained"

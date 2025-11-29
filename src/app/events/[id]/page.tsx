@@ -1,7 +1,8 @@
 "use client";
 
 import ConfirmDialog from "@/components/confirm-dialog";
-import { deleteEvent, getEvent } from "@/lib/queries";
+import EventCard from "@/components/event-card";
+import { deleteEvent, getEvent, getRecommendations } from "@/lib/queries";
 import { Event } from "@/types/event";
 import {
   Alert,
@@ -10,6 +11,7 @@ import {
   Chip,
   CircularProgress,
   Divider,
+  Grid,
   Typography,
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,7 +28,11 @@ export default function EventDetailsPage({
   const { id } = use(params);
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError } = useQuery<Event>({
+  const {
+    data: event,
+    isLoading,
+    isError,
+  } = useQuery<Event>({
     queryKey: ["event", id],
     queryFn: () => getEvent(id),
   });
@@ -42,6 +48,16 @@ export default function EventDetailsPage({
     },
   });
 
+  const {
+    data: recommendations,
+    isLoading: isLoadingRecs,
+    isError: isErrorRecs,
+  } = useQuery<Event[]>({
+    queryKey: ["event-recommendations", id],
+    queryFn: () => getRecommendations(id),
+    enabled: !!event,
+  });
+
   const [openDelete, setOpenDelete] = useState(false);
 
   if (isLoading) {
@@ -53,7 +69,7 @@ export default function EventDetailsPage({
     );
   }
 
-  if (isError || !data) {
+  if (isError || !event) {
     return (
       <Box p={4}>
         <Alert severity="error">Event not found</Alert>
@@ -68,8 +84,6 @@ export default function EventDetailsPage({
       </Box>
     );
   }
-
-  const event = data;
 
   return (
     <>
@@ -117,6 +131,39 @@ export default function EventDetailsPage({
         <Button variant="text" component={Link} href="/events">
           ← Back to Events
         </Button>
+
+        <Divider sx={{ my: 4 }} />
+        <Typography variant="h5" mb={2}>
+          Recommended Events
+        </Typography>
+
+        {isLoadingRecs && (
+          <Box textAlign="center" my={2}>
+            <CircularProgress size={20} />
+          </Box>
+        )}
+
+        {!isLoadingRecs && recommendations?.length === 0 && (
+          <Typography color="text.secondary">
+            No similar events nearby.
+          </Typography>
+        )}
+
+        {!isLoadingRecs && recommendations && recommendations.length > 0 && (
+          <Grid container spacing={2}>
+            {recommendations.map((rec: Event) => (
+              <Grid
+                key={rec.id}
+                size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+                sx={{ display: "flex" }}
+              >
+                <Box sx={{ flexGrow: 1 }}>
+                  <EventCard event={rec} />
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Box>
 
       <ConfirmDialog

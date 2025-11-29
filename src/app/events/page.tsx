@@ -111,6 +111,14 @@ export default function EventsPage() {
         </Box>
       )}
 
+      {!isLoading && (!data || data.length === 0) && (
+        <Box textAlign="center" my={4}>
+          <Typography variant="h6" color="text.secondary">
+            No events found.
+          </Typography>
+        </Box>
+      )}
+
       {isMapView ? (
         <Box sx={{ flex: 1, minHeight: 0, mt: 2 }}>
           <EventsMap events={data || []} />

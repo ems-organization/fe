@@ -11,7 +11,7 @@ export const getEvent = (id: string): Promise<Event> =>
   apiGet<Event>(`/events/${id}`);
 
 export const getRecommendations = (id: string): Promise<Event[]> =>
-  apiGet<Event[]>(`/events/${id}/recommendations`);
+  apiGet<Event[]>(`/events/${id}/recommend`);
 
 export const createEvent = (data: CreateEventPayload): Promise<Event[]> =>
   apiPost<Event[]>("/events", data);
